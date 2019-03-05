@@ -14,7 +14,7 @@ namespace Infrastructure.Identity
 
         public IdentityContext()
         {
-            _connection = new SqlConnection(ConfigurationManager.ConnectionStrings["DefaultConnection"].ConnectionString);
+            _connection = new SqlConnection(@"Data Source=.\SQL2014; Initial Catalog=MyIdentity; Integrated Security=true;");//ConfigurationManager.ConnectionStrings["DefaultConnection"].ConnectionString);
             _connection.Open();
         }
 

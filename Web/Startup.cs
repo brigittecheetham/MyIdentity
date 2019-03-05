@@ -11,7 +11,7 @@ namespace Web
     {
         public void Configuration(IAppBuilder app)
         {
-            
+            app.CreatePerOwinContext<ApplicationUserManager>(ApplicationUserManager.Create);
         }
     }
 }
