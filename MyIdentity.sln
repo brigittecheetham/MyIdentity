@@ -11,7 +11,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Infrastructure", "Infrastru
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Core", "Core\Core.csproj", "{0A40DCEC-FB29-4CE4-884F-D469140CB729}"
 EndProject
-Project("{00D1A9C2-B5F0-4AF3-8072-F6C62B433612}") = "MyIdentityDatabase", "MyIdentityDatabase\MyIdentityDatabase.sqlproj", "{87E356BB-3C5E-4893-A7EE-616EBB1B0525}"
+Project("{00D1A9C2-B5F0-4AF3-8072-F6C62B433612}") = "MyIdentity", "MyIdentityDatabase\MyIdentity.sqlproj", "{87E356BB-3C5E-4893-A7EE-616EBB1B0525}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
