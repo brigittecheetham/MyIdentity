@@ -1,0 +1,77 @@
+﻿@model IEnumerable<Web.ViewModels.MemberViewModel>
+
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>Members</h2>
+
+<table id="members" class="table table-bordered table-hover">
+    <thead>
+        <tr>
+            <th>First Name</th>
+            <th>Surname</th>
+            <th>Cellphone</th>
+            <th>Home Address</th>
+            <th>Email Address</th>
+            <th></th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var member in Model)
+        {
+            using (Html.BeginForm("Delete", "Member", new { Id = member.Id }, FormMethod.Post, null ))
+            {
+                <tr>
+                    <td>
+                        @member.Name
+                    </td>
+                    <td>
+                        @member.Surname
+                    </td>
+                    <td>
+                        @member.Cellphone
+                    </td>
+                    <td>
+                        @member.HomeAddress
+                    </td>
+                    <td>
+                        @member.UserName
+                    </td>
+                    <td>
+                        @Html.ActionLink("Edit Member", "Edit", "Member", new { Id = member.Id }, new { @class = "btn-link" })
+                    </td>
+                    <td>
+                        <input type="submit" class="btn-link" value="Delete member" style="line-height: normal"  />
+                    </td>
+                </tr>
+            }
+        }
+    </tbody>
+</table>
+
+
+@section scripts
+{
+    <script>
+
+                //$(document).ready(function () {
+                //    $("#customers .js-delete").on("click", function () {
+                //        var button = $(this);
+
+                //        if (confirm("Are you sure you want to delete this customer?")) {
+                //            $.ajax({
+                //                url: "/api/customers/" + button.attr("data-customer-id"),
+                //                method: "DELETE",
+                //                success: function () {
+                //                    button.parents("tr").remove();
+                //                }
+                //            });
+
+                //        }
+                //    });
+                //});
+    </script>
+}

@@ -66,7 +66,7 @@ namespace Web.Controllers
             switch (signInStatus)
             {
                 case SignInStatus.Success:
-                    return RedirectToAction("Index", "Home");
+                    return RedirectToAction("Index", "Member");
                 default:
                     ModelState.AddModelError("", "Invalid Credentials");
                     return View(model);
