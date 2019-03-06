@@ -14,9 +14,10 @@ namespace Web.Controllers
 {
     public class AccountController : Controller
     {
-
+        //resolve from the current http context
         public ApplicationUserManager mngr => HttpContext.GetOwinContext().Get<ApplicationUserManager>();
-            
+        public ApplicationSignInManager signInMngr => HttpContext.GetOwinContext().Get<ApplicationSignInManager>();
+
         public ActionResult Register()
         {
             return View();
@@ -48,6 +49,26 @@ namespace Web.Controllers
             ModelState.AddModelError("", identityResult.Errors.FirstOrDefault());
 
             return View(model);
+        }
+
+        public ActionResult Login()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        public async Task<ActionResult> Login(LoginViewModel model)
+        {
+            var signInStatus = await signInMngr.PasswordSignInAsync(model.Email, model.Password, true, false);
+
+            switch (signInStatus)
+            {
+                case SignInStatus.Success:
+                    return RedirectToAction("Index", "Home");
+                default:
+                    ModelState.AddModelError("", "Invalid Credentials");
+                    return View(model);
+            }
         }
     }
 }
