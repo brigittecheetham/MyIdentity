@@ -26,6 +26,10 @@ namespace Web.Controllers
         [HttpPost]
         public async Task<ActionResult> Register(RegisterViewModel model)
         {
+            if (!ModelState.IsValid)
+            {
+                return View(model);
+            }
 
             ApplicationUser user = new ApplicationUser
             {
@@ -38,14 +42,17 @@ namespace Web.Controllers
 
             };
 
-
             var identityResult = await mngr.CreateAsync(user, model.Password);
 
             if (identityResult.Succeeded)
             {
                 var currentUser = mngr.FindByName(user.UserName);
+
                 await mngr.AddToRoleAsync(currentUser.Id, RoleName.GeneralUser);
-                return RedirectToAction("Index", "Home");
+
+                await signInMngr.SignInAsync(user, isPersistent: false, rememberBrowser: false);
+
+                return RedirectToAction("Index", "Member");
             }
 
             ModelState.AddModelError("", identityResult.Errors.FirstOrDefault());

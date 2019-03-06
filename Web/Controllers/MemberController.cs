@@ -15,6 +15,7 @@ namespace Web.Controllers
     public class MemberController : Controller
     {
         public ApplicationUserManager mngr => HttpContext.GetOwinContext().Get<ApplicationUserManager>();
+        public ApplicationRoleManager roleMngr => HttpContext.GetOwinContext().Get<ApplicationRoleManager>();
 
         public ActionResult Index()
         {
@@ -54,6 +55,15 @@ namespace Web.Controllers
                 Title = member.Title,
                 UserName = member.UserName
             };
+
+            model.Roles = roleMngr.Roles.ToList();
+
+            var roles = await mngr.GetRolesAsync(Id);
+            if (roles != null && roles.Count > 0)
+            {
+                var role = await roleMngr.FindByNameAsync(roles[0]);
+                model.SelectedRole = role.Id;
+            }
 
             return View(model);
         }

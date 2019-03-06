@@ -32,15 +32,21 @@ namespace Web
             : base(userManager, authenticationManager)
         { }
 
-        //public override Task<ClaimsIdentity> CreateUserIdentityAsync(ApplicationUser user)
-        //{
-        //    return user.GenerateUserIdentityAsync((ApplicationUserManager)UserManager, DefaultAuthenticationTypes.ApplicationCookie);
-        //}
-
-
         public static ApplicationSignInManager Create(IdentityFactoryOptions<ApplicationSignInManager> options, IOwinContext context)
         {
             return new ApplicationSignInManager(context.GetUserManager<ApplicationUserManager>(), context.Authentication);
         }
     }
+
+
+    public class ApplicationRoleManager : RoleManager<ApplicationRole, int>
+    {
+        public ApplicationRoleManager(IRoleStore<ApplicationRole, int> store) : base(store) { }
+
+        public static ApplicationRoleManager Create(IdentityFactoryOptions<ApplicationRoleManager> options, IOwinContext context)
+        {
+            return new ApplicationRoleManager(new ApplicationRoleStore(new IdentityContext()));
+        }
+    }
+
 }

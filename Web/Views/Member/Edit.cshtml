@@ -54,6 +54,13 @@
     </div>
 
     <div class="form-group">
+        @Html.LabelFor(m => m.Roles, htmlAttributes: new { @class = "col-md-2 control-label " })
+        <div class="col-md-10">
+            @Html.DropDownListFor(m => m.SelectedRole, new SelectList(Model.Roles, "Id", "Name"),"", new { @class = "form-control", id = "Country" })
+        </div>
+    </div>
+
+    <div class="form-group">
         <div class="col-md-offset-2 col-md-10">
             <input class="btn btn-primary" type="submit" value="Update" />
             @Html.ActionLink("Cancel", "Index", "Member", new { @class = "btn btn-primary" })
