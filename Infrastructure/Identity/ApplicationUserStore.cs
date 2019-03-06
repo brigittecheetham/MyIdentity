@@ -9,7 +9,7 @@ using System.Data;
 
 namespace Infrastructure.Identity
 {
-    public class ApplicationUserStore : IUserPasswordStore<ApplicationUser, int>, IUserLockoutStore<ApplicationUser, int>, IUserTwoFactorStore<ApplicationUser, int>
+    public class ApplicationUserStore : IUserPasswordStore<ApplicationUser, int>, IUserLockoutStore<ApplicationUser, int>, IUserTwoFactorStore<ApplicationUser, int>, IUserRoleStore<ApplicationUser, int>
     {
         private IdentityContext _context;
 
@@ -209,6 +209,65 @@ namespace Infrastructure.Identity
             return Task.FromResult<Object>(null);
         }
 
-        
+        public async Task AddToRoleAsync(ApplicationUser user, string roleName)
+        {
+            using (SqlCommand cmd = _context.CreateCommand())
+            {
+                cmd.CommandText = @"
+                DECLARE @RoleId INT = (SELECT Id FROM ApplicationRole WHERE Name = @RoleName)
+
+                INSERT INTO ApplicationUserRole (
+                    UserId, RoleId) 
+                VALUES (
+                    @UserId, @RoleId)";
+                cmd.Parameters.AddWithValue("@UserId", user.Id);
+                cmd.Parameters.AddWithValue("@RoleName", roleName);
+                await cmd.ExecuteNonQueryAsync();
+            }
+        }
+
+        public Task RemoveFromRoleAsync(ApplicationUser user, string roleName)
+        {
+            throw new NotImplementedException();
+        }
+
+        public async Task<IList<string>> GetRolesAsync(ApplicationUser user)
+        {
+            List<string> userRoles = new List<string>();
+
+            using (SqlCommand cmd = _context.CreateCommand())
+            {
+                cmd.CommandText = @"
+                    SELECT Name 
+                    FROM ApplicationRole r 
+                    INNER JOIN ApplicationUserRole ur ON r.Id = ur.RoleId 
+                    WHERE ur.UserId = @UserId ";
+                cmd.Parameters.AddWithValue("@UserId", user.Id);
+
+                using (SqlDataReader reader = await cmd.ExecuteReaderAsync(CommandBehavior.SequentialAccess))
+                {
+                    while (await reader.ReadAsync())
+                    {
+                        string roleName = await reader.GetTextReader(0).ReadToEndAsync();
+                        
+                        userRoles.Add(roleName);
+                    }
+                }
+
+                await cmd.ExecuteNonQueryAsync();
+            }
+
+            return userRoles;
+        }
+
+        public async Task<bool> IsInRoleAsync(ApplicationUser user, string roleName)
+        {
+            var result = await GetRolesAsync(user);
+
+            if (result == null || result.Count == 0)
+                return false;
+
+            return result.Contains<string>(roleName);
+        }
     }
 }

@@ -43,6 +43,8 @@ namespace Web.Controllers
 
             if (identityResult.Succeeded)
             {
+                var currentUser = mngr.FindByName(user.UserName);
+                await mngr.AddToRoleAsync(currentUser.Id, RoleName.GeneralUser);
                 return RedirectToAction("Index", "Home");
             }
 
