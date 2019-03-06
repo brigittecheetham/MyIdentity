@@ -70,5 +70,11 @@ namespace Web.Controllers
                     return View(model);
             }
         }
+
+        public ActionResult LogOff()
+        {
+            signInMngr.AuthenticationManager.SignOut(DefaultAuthenticationTypes.ApplicationCookie);
+            return RedirectToAction("Index", "Home");
+        }
     }
 }
