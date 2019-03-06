@@ -65,14 +65,54 @@ namespace Infrastructure.Identity
         }
 
 
-        public Task<ApplicationRole> FindByIdAsync(int roleId)
+        public async Task<ApplicationRole> FindByIdAsync(int roleId)
         {
-            throw new NotImplementedException();
+            ApplicationRole role = new ApplicationRole();
+
+            using (SqlCommand cmd = _context.CreateCommand())
+            {
+                cmd.CommandText = @"SELECT Id, Name
+                                    FROM ApplicationRole
+                                    WHERE Name = @roleId ";
+                cmd.Parameters.AddWithValue("@roleId", roleId);
+                cmd.CommandType = CommandType.Text;
+
+                using (SqlDataReader reader = await cmd.ExecuteReaderAsync(CommandBehavior.SequentialAccess))
+                {
+                    while (await reader.ReadAsync())
+                    {
+                        role.Id = await reader.GetFieldValueAsync<int>(0);
+                        role.Name = await reader.GetTextReader(1).ReadToEndAsync();
+                    }
+                }
+            }
+
+            return role;
         }
 
-        public Task<ApplicationRole> FindByNameAsync(string roleName)
+        public async Task<ApplicationRole> FindByNameAsync(string roleName)
         {
-            throw new NotImplementedException();
+            ApplicationRole role = new ApplicationRole();
+
+            using (SqlCommand cmd = _context.CreateCommand())
+            {
+                cmd.CommandText = @"SELECT Id, Name
+                                    FROM ApplicationRole
+                                    WHERE Name = @roleName ";
+                cmd.Parameters.AddWithValue("@roleName", roleName);
+                cmd.CommandType = CommandType.Text;
+
+                using (SqlDataReader reader = await cmd.ExecuteReaderAsync(CommandBehavior.SequentialAccess))
+                {
+                    while (await reader.ReadAsync())
+                    {
+                        role.Id = await reader.GetFieldValueAsync<int>(0);
+                        role.Name = await reader.GetTextReader(1).ReadToEndAsync();
+                    }
+                }
+            }
+
+            return role;
         }
 
         public Task UpdateAsync(ApplicationRole role)

@@ -48,11 +48,22 @@ namespace Web.Controllers
             {
                 var currentUser = mngr.FindByName(user.UserName);
 
+                int userCount = mngr.Users.Count();
+                
+                //temporary code as I ran out of time to handle the proper creation of an Administrator
+                if (userCount == 1)
+                {
+                    await mngr.AddToRoleAsync(currentUser.Id, RoleName.Administrator);
+
+                    return RedirectToAction("Login", "Account");
+                }
+
                 await mngr.AddToRoleAsync(currentUser.Id, RoleName.GeneralUser);
 
                 await signInMngr.SignInAsync(user, isPersistent: false, rememberBrowser: false);
 
                 return RedirectToAction("Index", "Member");
+
             }
 
             ModelState.AddModelError("", identityResult.Errors.FirstOrDefault());
