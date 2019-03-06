@@ -9,9 +9,47 @@ using System.Data;
 
 namespace Infrastructure.Identity
 {
-    public class ApplicationUserStore : IUserPasswordStore<ApplicationUser, int>, IUserLockoutStore<ApplicationUser, int>, IUserTwoFactorStore<ApplicationUser, int>, IUserRoleStore<ApplicationUser, int>
+    public class ApplicationUserStore : IUserPasswordStore<ApplicationUser, int>, IUserLockoutStore<ApplicationUser, int>, IUserTwoFactorStore<ApplicationUser, int>, IUserRoleStore<ApplicationUser, int>, IQueryableUserStore<ApplicationUser, int>
     {
         private IdentityContext _context;
+
+        public IQueryable<ApplicationUser> Users
+        {
+            get
+            {
+                List<ApplicationUser> users = new List<ApplicationUser>();
+
+                using (SqlCommand cmd = _context.CreateCommand())
+                {
+                    cmd.CommandText = @"SELECT Id, UserName, Title, Name, Surname, Cellphone, HomeAddress, PasswordHash, SecurityStamp  
+                                    FROM ApplicationUser";
+                    cmd.CommandType = CommandType.Text;
+
+                    using (SqlDataReader reader = cmd.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+
+                            users.Add(new ApplicationUser
+                            {
+                                Id = reader.GetFieldValue<int>(0),
+                                UserName = reader.GetTextReader(1).ReadToEnd(),
+                                Title = reader.GetTextReader(2).ReadToEnd(),
+                                Name = reader.GetTextReader(3).ReadToEnd(),
+                                Surname = reader.GetTextReader(4).ReadToEnd(),
+                                Cellphone = reader.GetTextReader(5).ReadToEnd(),
+                                HomeAddress = reader.GetTextReader(6).ReadToEnd(),
+                                PasswordHash = reader.GetTextReader(7).ReadToEnd(),
+                                SecurityStamp = reader.GetTextReader(8).ReadToEnd()
+                            });
+                        }
+                    }
+                }
+
+                return users.AsQueryable();
+
+            }
+        }
 
         public ApplicationUserStore(IdentityContext context)
         {
@@ -43,9 +81,18 @@ namespace Infrastructure.Identity
             }
         }
 
-        public Task DeleteAsync(ApplicationUser user)
+        public async Task DeleteAsync(ApplicationUser user)
         {
-            throw new NotImplementedException();
+            using (SqlCommand cmd = _context.CreateCommand())
+            {
+                cmd.CommandText = @"
+                DELETE FROM ApplicationUser
+                WHERE Id = @UserId";
+
+                cmd.Parameters.AddWithValue("@UserId", user.Id);
+
+                await cmd.ExecuteNonQueryAsync();
+            }
         }
 
         public async Task<ApplicationUser> FindByIdAsync(int userId)
@@ -108,9 +155,30 @@ namespace Infrastructure.Identity
             return user;
         }
 
-        public Task UpdateAsync(ApplicationUser user)
+        public async Task UpdateAsync(ApplicationUser user)
         {
-            return Task.FromResult<Object>(null);
+            using (SqlCommand cmd = _context.CreateCommand())
+            {
+                cmd.CommandText = @"
+                UPDATE ApplicationUser SET
+                    UserName = @UserName, 
+                    Title = @Title, 
+                    Name = @Name, 
+                    Surname = @Surname, 
+                    Cellphone = @Cellphone, 
+                    HomeAddress = @HomeAddress
+                WHERE Id = @UserId";
+
+                cmd.Parameters.AddWithValue("@UserName", user.UserName);
+                cmd.Parameters.AddWithValue("@Title", user.Title);
+                cmd.Parameters.AddWithValue("@Name", user.Name);
+                cmd.Parameters.AddWithValue("@Surname", user.Surname);
+                cmd.Parameters.AddWithValue("@Cellphone", user.Cellphone);
+                cmd.Parameters.AddWithValue("@HomeAddress", user.HomeAddress);
+                cmd.Parameters.AddWithValue("@UserId", user.Id);
+
+                await cmd.ExecuteNonQueryAsync();
+            }
         }
 
         public Task<bool> HasPasswordAsync(ApplicationUser user)

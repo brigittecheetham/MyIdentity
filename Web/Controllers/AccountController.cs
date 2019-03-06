@@ -61,7 +61,7 @@ namespace Web.Controllers
         [HttpPost]
         public async Task<ActionResult> Login(LoginViewModel model)
         {
-            var signInStatus = await signInMngr.PasswordSignInAsync(model.Email, model.Password, true, false);
+            var signInStatus = await signInMngr.PasswordSignInAsync(model.Email, model.Password, false, false);
 
             switch (signInStatus)
             {
